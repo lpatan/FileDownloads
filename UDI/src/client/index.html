@@ -1,0 +1,46 @@
+<html>
+<head>
+<title>Home</title>
+</head>
+<body ng-app="fileUpload">
+	<h1>Node File Upload</h1>
+	<form ng-controller="MyCtrl as up" name="up.upload_form">
+		Select File <input type="file" ngf-select ng-model="up.fileName"
+			name="fileName" ngf-pattern="'.xml'" accept=".xml" ngf-max-size="20MB" />
+		<i ng-show="up.upload_form.fileName.$error.maxSize">File too large
+			{{up.fileName.size / 1000000|number:1}}MB: max 20M</i>
+		<!--  Multiple files
+            <div class="button" ngf-select ng-model="up.files" ngf-multiple="true">Select</div>
+            Drop files: <div ngf-drop ng-model="up.files" class="drop-box">Drop</div> -->
+		<button type="submit" ng-click="up.submit()">submit</button>
+		<br><br>
+		List of Available Files: 
+	<table>
+		<thead>
+			<tr style="background-color: white;">
+				<th width="16%">File Name</th>
+				<th width="30%">Download</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr ng-repeat="fileName_ in fileList">
+				<td width="16%">{{fileName_}}</td>
+				<td width="30%"><a href="/download/{{fileName}}">{{fileName_}}</a> </td>
+			</tr>
+		</tbody>
+	</table>
+	<input name="userID" type="hidden" value="lpatan"/>
+	</form>
+	
+
+	
+</body>
+
+</body>
+<script type="text/javascript" src="node_modules/angular/angular.min.js"></script>
+<script type="text/javascript"
+	src="node_modules/ng-file-upload/dist/ng-file-upload.min.js"></script>
+<script type="text/javascript"
+	src="node_modules/ng-file-upload/dist/ng-file-upload-shim.min.js"></script>
+<script type="text/javascript" src="main.js"></script>
+</html>
