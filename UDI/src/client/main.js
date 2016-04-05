@@ -1,7 +1,7 @@
 angular.module('fileUpload', ['ngFileUpload'])
 .controller('MyCtrl',['Upload','$http', '$window','$scope',function(Upload, $http, $window, $scope){
 	
-	$http.get('/download').success(
+	$http.post('/download').success(
 	function(data) {
 		$scope.fileList = data;
 	});
