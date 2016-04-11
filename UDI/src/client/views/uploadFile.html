@@ -1,0 +1,29 @@
+<h1>Upload File</h1>
+
+<div style="width: 100%; margin-left: 20px;">
+	<div class="form-group">
+		<input type="text" style="width: 200px" class="form-control input-sm"
+			ng-model="fileName" placeholder="File Name, ex: text.xml" />
+	</div>
+
+	<div class="form-group">
+		<textarea id="text" cols="100" rows="10" my-maxlength="5"
+			ng-model="fileData"></textarea>
+	</div>
+	<div>
+		<div class="home" style="float: left">
+			<button type="button" class="btn btn-default btn-responsive"
+				ng-click="save()">
+				<b>Save</b>
+			</button>
+		</div>
+		<div style="float: left; width: 70px !important;">
+			<button type="button" class="btn btn-default btn-responsive"
+				ng-click="cancel()">
+				<b>Cancel</b>
+			</button>
+		</div>
+	</div>
+
+
+</div>

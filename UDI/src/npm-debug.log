@@ -1,0 +1,65 @@
+0 info it worked if it ends with ok
+1 verbose cli [ 'node',
+1 verbose cli   'C:\\node\\npm\\node_modules\\npm\\bin\\npm-cli.js',
+1 verbose cli   'install',
+1 verbose cli   'libxlmljs' ]
+2 info using npm@1.4.9
+3 info using node@v0.12.7
+4 verbose cache add [ 'libxlmljs', null ]
+5 verbose cache add name=undefined spec="libxlmljs" args=["libxlmljs",null]
+6 verbose parsed url { protocol: null,
+6 verbose parsed url   slashes: null,
+6 verbose parsed url   auth: null,
+6 verbose parsed url   host: null,
+6 verbose parsed url   port: null,
+6 verbose parsed url   hostname: null,
+6 verbose parsed url   hash: null,
+6 verbose parsed url   search: null,
+6 verbose parsed url   query: null,
+6 verbose parsed url   pathname: 'libxlmljs',
+6 verbose parsed url   path: 'libxlmljs',
+6 verbose parsed url   href: 'libxlmljs' }
+7 silly lockFile f4bb34a4-libxlmljs libxlmljs
+8 verbose lock libxlmljs C:\Users\LPatan\AppData\Roaming\npm-cache\f4bb34a4-libxlmljs.lock
+9 silly lockFile f4bb34a4-libxlmljs libxlmljs
+10 silly lockFile f4bb34a4-libxlmljs libxlmljs
+11 verbose addNamed [ 'libxlmljs', '' ]
+12 verbose addNamed [ null, '*' ]
+13 silly lockFile b9fb2e14-libxlmljs libxlmljs@
+14 verbose lock libxlmljs@ C:\Users\LPatan\AppData\Roaming\npm-cache\b9fb2e14-libxlmljs.lock
+15 silly addNameRange { name: 'libxlmljs', range: '*', hasData: false }
+16 verbose url raw libxlmljs
+17 verbose url resolving [ 'https://registry.npmjs.org/', './libxlmljs' ]
+18 verbose url resolved https://registry.npmjs.org/libxlmljs
+19 info trying registry request attempt 1 at 11:11:06 PM
+20 http GET https://registry.npmjs.org/libxlmljs
+21 http 404 https://registry.npmjs.org/libxlmljs
+22 silly registry.get cb [ 404,
+22 silly registry.get   { 'content-type': 'application/json',
+22 silly registry.get     'cache-control': 'max-age=0',
+22 silly registry.get     'content-length': '2',
+22 silly registry.get     'accept-ranges': 'bytes',
+22 silly registry.get     date: 'Tue, 05 Apr 2016 03:11:07 GMT',
+22 silly registry.get     via: '1.1 varnish',
+22 silly registry.get     age: '0',
+22 silly registry.get     connection: 'close',
+22 silly registry.get     'x-served-by': 'cache-dfw1827-DFW',
+22 silly registry.get     'x-cache': 'MISS',
+22 silly registry.get     'x-cache-hits': '0',
+22 silly registry.get     'x-timer': 'S1459825866.905388,VS0,VE264' } ]
+23 silly lockFile b9fb2e14-libxlmljs libxlmljs@
+24 silly lockFile b9fb2e14-libxlmljs libxlmljs@
+25 error 404 Not Found
+25 error 404
+25 error 404 'libxlmljs' is not in the npm registry.
+25 error 404 You should bug the author to publish it
+25 error 404
+25 error 404 Note that you can also install from a
+25 error 404 tarball, folder, or http url, or git url.
+26 error System Windows_NT 6.1.7601
+27 error command "node" "C:\\node\\npm\\node_modules\\npm\\bin\\npm-cli.js" "install" "libxlmljs"
+28 error cwd C:\Liyakath\git_new\UDI\src
+29 error node -v v0.12.7
+30 error npm -v 1.4.9
+31 error code E404
+32 verbose exit [ 1, true ]

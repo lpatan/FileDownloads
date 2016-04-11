@@ -1,0 +1,359 @@
+<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+	<div class="container navAlign">
+		<div class="navbar-header">
+			<a class="navbar-brand" style="color: white">Deliver Orders</a>
+		</div>
+	</div>
+</nav>
+
+<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation" id="slide-nav">
+	<div class="navbar-header">
+		<a class="navbar-brand" style="color: white;float=left">Deliver Orders</a>
+	</div>
+</nav>
+
+<ul class="nav nav-pills nav-wizard">
+	<li ng-class="{active:isCurrentStep(0)}">
+		<a href ng-click="setCurrentStep(0)" data-toggle="tab">Verify Order</a>
+		<div class="nav-arrow"></div>
+	</li>
+	<li ng-class="{active:isCurrentStep(1)}">
+		<div class="nav-wedge"></div>
+		<a href ng-click="setCurrentStep(1)" data-toggle="tab" ng-disabled="!deliverOrderFlag">Collect Information</a>
+		<div class="nav-arrow"></div>
+	</li>
+	<li ng-class="{active:isCurrentStep(2)}">
+		<div class="nav-wedge"></div>
+		<a href ng-click="setCurrentStep(2)" data-toggle="tab">Process Payment</a>
+	</li>
+</ul>
+
+<div class="slide-frame" ng-switch="getCurrentStep();">
+	<div ng-switch-when="one" class="wave">
+		<div class="container tablecontainer verifyOrder">
+			<table class="table table-striped header-fixed verify-order">
+				<thead style="background-color: #D4EBF3;">
+					<tr style="background-color:white;">
+						<th width="16%" ng-click="sortType='Store'; sortReverse = !sortReverse">Store
+							<i ng-show="sortReverse" class="fa fa-sort-numeric-asc fa-lg"></i>
+							<i ng-show="!sortReverse" class="fa fa-sort-numeric-desc fa-lg"></i>
+						<th width="26%" ng-click="sortType='PatientName'; sortReverse = !sortReverse">Patient Name&emsp; <i ng-show="sortReverse"
+							class="fa fa-sort-alpha-desc fa-lg"></i> <i ng-show="!sortReverse"
+							class="fa fa-sort-alpha-asc fa-lg"></i>
+						</th>
+						<th width="26%" ng-click="sortType='Address1'; sortReverse = !sortReverse">Address&emsp;
+							<i ng-show="sortReverse" class="fa fa-sort-alpha-desc fa-lg"></i>
+							<i ng-show="!sortReverse" class="fa fa-sort-alpha-asc fa-lg"></i>
+						</th>
+						<th width="16%" colspan="2" style="text-align: center"
+							ng-click="sortType='Price'; sortReverse = !sortReverse">Price
+							<i ng-show="sortReverse" class="fa fa-sort-numeric-asc fa-lg"></i>
+							<i ng-show="!sortReverse" class="fa fa-sort-numeric-desc fa-lg"></i>
+						</th>
+						<th width="16%" style="text-align: center;">Scanned?</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-repeat="order in orders.verifyOrderList | orderBy:sortType:sortReverse" ng-click="openOrderDetails(order.Id);">
+						<td width="16%">{{order.Store}}</td>
+						<td width="26%">{{order.PatientName}}</td>
+						<td width="26%">{{order.Address1}}<br />{{order.Address2}}</td>
+						<td width="8%" style="text-align: right; padding-right: 0px;">{{order.Price.split('.')[0]}}</td>
+						<td width="8%" style="text-align: left; padding-left: 0px;">.{{order.Price.split('.')[1]}}</td>
+						<td style="text-align: center;" ng-model="order.Scanned" ng-click="enableDisableDeliverBtn(order)">
+							<i class="fa fa-2x color-blue" ng-class="{'fa-check': order.Scanned}"></i>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+
+			<div class="panel-footer">
+				<div class="home" style="float: left">
+					<button type="button" class="btn btn-default btn-responsive" ng-click="go('deliveryType');">
+						<span class="fa fa-home fa-lg"></span></span> <br>Home
+					</button>
+				</div>
+				<div class="help" style="float: left">
+					<button type="button" class="btn btn-default btn-responsive" id="pageHelp" ng-click="loadHelp()">
+						<span class="fa fa-question fa-lg"></span><br>Help
+					</button>
+				</div>
+				<div class="notes" style="float: left">
+					<button type="button" class="btn btn-default btn-responsive" id="delNotes" ng-click="openDeliveryNotesModal();">
+						<span class="fa fa-file-text-o fa-lg"></span><br>Delivery Notes
+					</button>
+				</div>
+				<div class="accept pull-right">
+					<button type="button" style="background-color: #E0E0E0"	class="btn btn-default btn-responsive" ng-click="confirmedDeliverOrders();handleNext();">
+						<span class="fa fa-arrow-circle-right fa-lg" ng-class="{'fa-arrow-circle': deliverOrderFlag,'fa-arrow-thin': !deliverOrderFlag}"></span><br>Deliver
+					</button>
+				</div>
+			</div>
+		</div>
+
+	</div>
+
+
+	<div ng-switch-when="two" class="wave">
+		<div ng-show="promptName == 'PICKUP_ID' && displaySigPad == false">
+			<div class="container tablecontainer verifyOrder"
+				style="background-color: #CCFF9A">
+				<span>State regulation requires we capture information from
+					the person picking up this Prescription (Rx# <span
+					ng-repeat="order in confirmedDeliverOrdersList">{{order.RxNo}}{{$last
+						? '' : ', '}}</span>) for the patient. ACCURACY OF THE DATA IS CRITICAL <br />
+					<br /> You are providing signature for the following patients
+				</span> <span ng-repeat="order in confirmedDeliverOrdersList"> <br />{{
+					$index + 1 }}.{{order.PatientName}}
+				</span>
+			</div>
+
+			<form name="pickupIdForm" novalidate>
+				<table class="table no-border" style="margin-left: 20px; width: 70%">
+					<tr>
+						<td width="10%"><label>1</label></td>
+						<td width="40%"><label>Pick up ID Type</label></td>
+						<td width="50%">
+							<select ng-model="selectedPickupID" class="form-control" name="PickupIDType"
+								ng-options="IDType.Type for IDType in preferenceDrug.PromptAtPos.IDTypes" required>
+								<option value=""></option>
+							</select>
+						</td>
+					</tr>
+					<tr ng-repeat="attrs in selectedPickupID.OtherSRDAttributes" ng-if="$index != 0">
+						<td><label>{{attrs.Order}}</label></td>
+						<td><label>{{attrs.Name}}</label></td>
+						<td><input type="text" data-ng-model="attrs.value" name="{{attrs.Name.split('_')[0].split('_')[1] | titleCase}} {{attrs.Name.split('_')[1]| titleCase}}" class="form-control" required /> 
+							<span style="color: red" ng-class="has-error" data-ng-show="submitted && {{'pickupIdForm.'+attrs.Name+'.$error.required'}}">
+								Please enter the {{attrs.Name}} 
+							</span>
+						</td>
+					</tr>
+				</table>
+
+				<div class="panel-footer">
+					<div class="home" style="float: left">
+						<button type="button" class="btn btn-default btn-responsive" ng-click="setCurrentStep(0)">
+							<span class="fa fa-times fa-lg"></span><br>Cancel
+						</button>
+					</div>
+					<div class="help" style="float: left">
+						<button type="button" class="btn btn-default btn-responsive" id="pageHelp">
+							<span class="fa fa-question fa-lg"></span><br>Help
+						</button>
+					</div>
+					<div class="accept pull-right">
+						<button type="button" style="background-color: #E0E0E0" class="btn btn-default btn-responsive" ng-click="pickupIdForm.$invalid ? submitted = true : handleNext(true);">
+							<span class="fa fa-arrow-circle-right fa-lg" 
+								ng-class="{'fa-arrow-circle': !pickupIdForm.idName.$invalid && !pickupIdForm.idType.$invalid,'fa-arrow-thin': pickupIdForm.idName.$invalid || pickupIdForm.idType.$invalid}"></span><br>Continue
+						</button>
+					</div>
+				</div>
+			</form>
+		</div>
+
+		<div ng-show="promptName == 'PATIENT_ID'">
+			<div class="container tablecontainer verifyOrder"
+				style="background-color: #CCFF9A">
+				<span>State regulation requires we capture information from
+					the person picking up this Prescription (Rx# <span
+					ng-repeat="order in confirmedDeliverOrdersList">{{order.RxNo}}{{$last
+						? '' : ', '}}</span>) for the patient. ACCURACY OF THE DATA IS CRITICAL <br />
+					<br /> You are providing signature for the following patients
+				</span>
+			</div>
+			<table class="table table-striped header-fixed driver-order">
+				<tbody>
+					<tr ng-repeat="order in confirmedDeliverOrdersList"
+						ng-click="showPatientIDPage(order)">
+						<td width="16%">{{order.Store}}</td>
+						<td width="30%">{{order.PatientName}}<br />{{order.Phone}}
+						</td>
+						<td width="40%">{{order.Address1}}<br />{{order.Address2}}
+						</td>
+						<td width="14%" style="margin-left: 30px; text-align: center;"><i
+							class="fa fa-2x fa-check"></i></td>
+					</tr>
+				</tbody>
+			</table>
+			<div class="panel-footer">
+				<div class="home" style="float: left">
+					<button type="button" class="btn btn-default btn-responsive"
+						ng-click="setCurrentStep(1)">
+						<span class="fa fa-times fa-lg"></span> </span> <br>Cancel
+					</button>
+				</div>
+				<div class="help" style="float: left">
+					<button type="button" class="btn btn-default btn-responsive">
+						<span class="fa fa-question fa-lg"></span><br>Help
+					</button>
+				</div>
+				<div class="accept pull-right">
+					<button type="button" style="background-color: #E0E0E0"
+						class="btn btn-default btn-responsive" ng-click="handleNext();">
+						<span class="fa fa-arrow-circle-right fa-lg"
+							ng-class="{'fa-arrow-circle': patientIDFlag,'fa-arrow-thin': !patientIDFlag}"></span><br>Continue
+					</button>
+				</div>
+			</div>
+		</div>
+
+		<div ng-if="showPatientID==true">
+			<div class="container tablecontainer verifyOrder"
+				style="background-color: #CCFF9A">
+				<span>Please provide information for the following patient<br />{{patientOrder.PatientName}}
+				</span>
+			</div>
+
+			<form name="patientIdForm" novalidate>
+				<table class="table no-border" style="margin-left: 20px; width: 70%">
+					<tr>
+						<td width="10%"><label>1</label></td>
+						<td width="40%"><label>Qualifier</label></td>
+
+						<td width="50%"><select ng-model="selectedPickupID"
+							class="form-control" name="PickupIDType"
+							ng-options="IDType.Type for IDType in preferenceDrug.PromptAtPos.IDTypes"
+							required>
+								<option value=""></option>
+						</select>
+					</tr>
+					<tr ng-repeat="attrs in selectedPickupID.OtherSRDAttributes"
+						ng-if="$index != 0">
+						<td><label>{{attrs.Order}}</label></td>
+						<td><label>{{attrs.Name}}</label></td>
+						<td><input type="text" data-ng-model="attrs.value"
+							name="{{attrs.Name}}" class="form-control" required /> <br /> <span
+							style="color: red" ng-class="has-error"
+							data-ng-show="submitted && {{'pickupIdForm.'+attrs.Name+'.$error.required'}}">Please
+								enter the {{attrs.Name}} </span></td>
+					</tr>
+				</table>
+
+				<div class="panel-footer">
+					<div class="home" style="float: left">
+						<button type="button" class="btn btn-default btn-responsive"
+							ng-click="setCurrentStep(0)">
+							<span class="fa fa-times fa-lg"></span><br>Back
+						</button>
+					</div>
+					<div class="help" style="float: left">
+						<button type="button" class="btn btn-default btn-responsive">
+							<span class="fa fa-question fa-lg"></span><br>Help
+						</button>
+					</div>
+					<div class="help" style="float: left">
+						<button type="button" class="btn btn-default btn-responsive">
+							<span class="fa fa-trash fa-lg"></span><br>Remove Patient
+						</button>
+					</div>
+					<div class="accept pull-right">
+						<button type="button" style="background-color: #E0E0E0"
+							class="btn btn-default btn-responsive"
+							ng-click="pickupIdForm.$invalid ? submitted = true : handleNext();">
+							<span class="fa fa-arrow-circle-right fa-lg"
+								ng-class="{'fa-arrow-circle': !pickupIdForm.idName.$invalid && !pickupIdForm.idType.$invalid,'fa-arrow-thin': pickupIdForm.idName.$invalid || pickupIdForm.idType.$invalid}"></span><br>Done
+						</button>
+					</div>
+				</div>
+			</form>
+		</div>
+
+		<div ng-show="displaySigPad == true">
+			<div class="container" id="signatureController">
+				<br /> <span><b>SAFETY CAP:</b><br /> Am aware that
+					one/more of the prescriptions I am picking up have a<br />
+					non-safety cap per customer request. </span> <br /> <br /> <span><b>THIRD
+						PARTY:</b><br /> Am receiving these medications, authorize release of
+					my prescription<br /> records to those parties providing
+					prescription benefits, and request payment from them on my behalf </span>
+				<br /> <br /> <span><b>HIPAA:</b><br />Acknowledge receipt
+					of CVS's Notice of Privacy Practices.<br /> <br /> Am picking up
+					the following prescriptions.<br />&emps;-0123490 <br />&emps;-0198423<br />&emps;-0023155
+				</span><br /> <br /> <span><b>AUTOMATED OUTREACH CONSENT:</b><br />I
+					am signing below to indicate that I:-Have received these medication
+					and request payment on my behalf.I authorize release of my health
+					record to any party responsible for payment - Authorize CVS and its
+					affiliates to call and/or text me using an automated dialing system
+					and/or prerecorded voice. </span><br /> <br /> <br />
+			</div>
+			<div class="panel-footer">
+				<div class="container-fluid" id="sigPanel">
+					<div class="panel-msg"
+						style="background-color: #5c94ab; padding-top: 15px; height: 50px; color: white;">
+						<center>PLEASE SIGN HERE</center>
+					</div>
+					<div id="signaturdiv">
+						<div class="canvas-container">
+							<canvas width="700" height="300" id="canvas" drawing></canvas>
+							<div class="clear" style="float: left;">
+								<button ng-click="reset()" type="button"
+									style="background-color: #666666">CLEAR</button>
+							</div>
+							<div class="save" style="float: right">
+								<button ng-click="setCurrentStep(2)" type="button"
+									style="background-color: #669934">CONTINUE</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+	<div ng-switch-when="three" class="wave">
+		<div class="container tablecontainer verifyOrder"
+			style="background-color: #CCFF9A">
+			<br /> <span>Instructions: State regulation requires we
+				capture information from the person picking up this Prescription
+				(Rx# for the patient. ACCURACY OF THE DATA IS CRITICAL<br />
+			</span> <br />
+		</div>
+		<div class="container tablecontainer verifyOrder">
+			<table class="table table-striped header-fixed verify-order">
+				<tbody>
+					<tr
+						ng-repeat="order in confirmedDeliverOrdersList | orderBy:sortType:sortReverse">
+
+						<td width="60%">{{order.PatientName}} <br />
+							{{order.Address1}},{{order.Address2}} <br /> Store:
+							{{order.Store}}
+						</td>
+						<td width="20%">Total <br />
+							<h3 style="margin-top: 1px; color: #5C94AB">{{order.Price}}</h3></td>
+						<td width="20%" style="padding-top: 25px; text-align: center;"
+							valign="center" ng-model="expand" ng-click="expand=!expand"><i
+							class="fa fa-2x"
+							ng-class="{'fa-circle-thin': !expand, 'fa-check-circle': expand}"></i>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+
+		<div class="panel-footer">
+			<div class="home" style="float: left">
+				<button type="button" class="btn btn-default btn-responsive"
+					ng-click="setCurrentStep(1)">
+					<span class="fa fa-times fa-lg"></span> </span> <br>Cancel
+				</button>
+			</div>
+			<div class="help" style="float: left">
+				<button type="button" class="btn btn-default btn-responsive"
+					id="pageHelp">
+					<span class="fa fa-question fa-lg"></span><br>Help
+				</button>
+			</div>
+			<div class="accept pull-right">
+				<button type="button" style="background-color: #E0E0E0"
+					class="btn btn-default btn-responsive" ng-click="handleNext();">
+					<span class="fa fa-arrow-circle-right fa-lg"
+						ng-class="{'fa-arrow-circle': deliverOrderFlag,'fa-arrow-thin': !deliverOrderFlag}"></span><br>{{getNextLabel()}}
+				</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<link href="styles/verifyDeliverOrders.css" rel="stylesheet">

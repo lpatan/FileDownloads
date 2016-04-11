@@ -1,0 +1,32 @@
+	<div>
+		<div class="container tablecontainer verifyOrder">
+			<table class="table" >
+				<thead style="background-color: #D4EBF3;">
+					<tr style="background-color: white;">
+						<th align="left" width="32%" style="padding-left: 35px;">File Name</th>
+					</tr>
+				</thead>
+			<tbody ng-repeat="file in fileList">
+				<tr>
+					<td width="30%" style="padding-left: 35px;">
+						<li><a ng-href="#" ng-click="download(file.filename)"
+							target="_self"> {{file.filename}} </a></li>
+					</td>
+
+				</tr>
+			</tbody>
+		</table>
+
+				<div>
+
+		<div style="float: left; width: 70px !important;">
+			<button type="button" class="btn btn-default btn-responsive"
+				ng-click="cancel()">
+				<b>Back</b>
+			</button>
+		</div>
+	</div>
+			
+		</div>
+	</div>
+
