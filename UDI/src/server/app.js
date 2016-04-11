@@ -5,8 +5,57 @@
     app.use(rawBodyParser());
 
     var fs = require('fs');
+    app.use(express.static('../client'));
     var router = express.Router();
+	var path=require('path'); 
+    var configuration = JSON.parse(
+    	    fs.readFileSync('config.json')
+    );
     
+    app.use(function(req, res, next){
+        // create a domain for this request
+        var domain = require('domain').create();
+        // handle errors on this domain
+        domain.on('error', function(err){
+            console.error('DOMAIN ERROR CAUGHT\n', err.stack);
+            try {
+                // failsafe shutdown in 5 seconds
+                setTimeout(function(){
+                    console.error('Failsafe shutdown.');
+                    process.exit(1);
+                }, 5000);
+
+                // disconnect from the cluster
+                var worker = require('cluster').worker;
+                if(worker) worker.disconnect();
+
+                // stop taking new requests
+                server.close();
+
+                try {
+                    // attempt to use Express error route
+                    next(err);
+                } catch(error){
+                    // if Express error route failed, try
+                    // plain Node response
+                    console.error('Express error mechanism failed.\n', error.stack);
+                    res.statusCode = 500;
+                    res.setHeader('content-type', 'text/plain');
+                    res.end('Server error.');
+                }
+            } catch(error){
+                console.error('Unable to send 500 response.\n', error.stack);
+            }
+        });
+
+        // add the request and response objects to the domain
+        domain.add(req);
+        domain.add(res);
+
+        // execute the rest of the request chain in the domain
+        domain.run(next);
+    });
+
     app.use('/api/fda-udi', router);
     router.route('/')
     .get(function(req, res) {
@@ -15,33 +64,34 @@
     });
     router.route('/requests/:filename')
      .post(function(req, res) {
-    	 console.log('DEMO---'+req.params.filename);
-    	 var rawBody = req.rawBody.toString('utf8');
-     	console.log(rawBody);
+    	var rawBody = req.rawBody.toString('utf8');
     	if(!req.headers['x-as2-userid']){
     		return res.json({error_code:401, err_desc:'The user id is not found'});
     	}
-//    	if(!req.headers['x-as2-timestamp'] || !req.headers['x-as2-auth-token']){
-//    		return res.json({error_code:403, err_desc:'Invalid request'});
-//    	}
-//    	if(!authenticate(req, true)){
-//    		var respData = {
-//    				"Code": 401,
-//    				"Content": "After concatenating the userid, filename, timestamp, and the content of the HL7 XML file and applying the HMAC-SHA256 with a secret key, the hash value is different than the value in the x-as2-authtoken"
-//    			};
-//    		return res.json(respData);    		
-//    	}
-    	if(req.get('Content-Type') =='application/xml'){
-    		 	var writeStream = fs.createWriteStream(req.params.filename);
+    	if(!req.headers['x-as2-timestamp'] || !req.headers['x-as2-auth-token']){
+    		return res.json({error_code:403, err_desc:'Invalid request'});
+    	}
+    	if(!authenticate(req, true)){
+    		var respData = {
+    				"Code": 401,
+    				"Content": "After concatenating the userid, filename, timestamp, and the content of the HL7 XML file and applying the HMAC-SHA256 with a secret key, the hash value is different than the value in the x-as2-authtoken"
+    			};
+    		return res.json(respData);    		
+    	}
+//    	 if(req.get('Content-Type') ==='application/xml'){
+    			if (!fs.existsSync(configuration.uploadpath)){
+    			    fs.mkdirSync(configuration.uploadpath);
+    			}
+    		 	var writeStream = fs.createWriteStream(configuration.uploadpath + req.params.filename);
     	    	writeStream.write(rawBody);
     	    	var respData = {
     	    				"Code": 200,
-    	    				"Content": { "message-id": req.get('message-id') }
+    	    				"Content": { "message-id": req.headers['message-id'] }
     	    			};
     	    	return res.json(respData);
-    	 } else {
-    		 return res.json({error_code:403, err_desc:'Invalid Content Type.'});
-    	 }
+//    	 } else {
+//    		 return res.json({error_code:403, err_desc:'Invalid Content Type.'});
+//    	 }
      });
     
     router.route('/responses')
@@ -49,24 +99,22 @@
 	   	if(!req.headers['x-as2-userid']){
 	   		return res.json({error_code:401, err_desc:'The user id is not found'});
 	   	}
-//   	if(!req.headers['x-as2-timestamp'] || !req.headers['x-as2-auth-token']){
-//   		return res.json({error_code:403, err_desc:'Invalid request'});
-//   	}
-//		   	if(!authenticate(req, true)){
-//		   		var respData = {
-//						"Code": 401,
-//						"Content": "After concatenating the userid, filename, timestamp, and the content of the HL7 XML file and applying the HMAC-SHA256 with a secret key, the hash value is different than the value in the x-as2-authtoken"
-//					};
-//				return res.json(respData);    		
-//		   	}
-//   	
-			var path=require('path'); 
+   	if(!req.headers['x-as2-timestamp'] || !req.headers['x-as2-auth-token']){
+   		return res.json({error_code:403, err_desc:'Invalid request'});
+   	}
+		   	if(!authenticate(req, false)){
+		   		var respData = {
+						"Code": 401,
+						"Content": "After concatenating the userid, filename, timestamp, and the content of the HL7 XML file and applying the HMAC-SHA256 with a secret key, the hash value is different than the value in the x-as2-authtoken"
+					};
+				return res.json(respData);    		
+		   	}
+
     		var fileList = [];
-			var dir=path.resolve(""); // give path
-			console.log(dir);
+			var dir=path.resolve(configuration.uploadpath); // give path
 			var files = fs.readdirSync(dir);
 			for (var i=0; i<files.length; i++) {
-		        console.log(files[i]);
+
 		        var temp = {"filename": files[i]};
 		        fileList.push(temp);
 		    }
@@ -74,7 +122,7 @@
 					"Code": 200,
 					"Content": {"responses" : fileList}
 			};
-			console.log(respData);
+
    	    	return res.json(respData);
 
     });
@@ -84,20 +132,19 @@
 	   	if(!req.headers['x-as2-userid']){
 	   		return res.json({error_code:401, err_desc:'The user id is not found'});
 	   	}
-//   	if(!req.headers['x-as2-timestamp'] || !req.headers['x-as2-auth-token']){
-//   		return res.json({error_code:403, err_desc:'Invalid request'});
-//   	}
-//		   	if(!authenticate(req, true)){
-//		   		var respData = {
-//						"Code": 401,
-//						"Content": "After concatenating the userid, filename, timestamp, and the content of the HL7 XML file and applying the HMAC-SHA256 with a secret key, the hash value is different than the value in the x-as2-authtoken"
-//					};
-//				return res.json(respData);    		
-//		   	}
-//   	
-			var path=require('path');
+	   	if(!req.headers['x-as2-timestamp'] || !req.headers['x-as2-auth-token']){
+	   		return res.json({error_code:403, err_desc:'Invalid request'});
+	   	}
+		   if(!authenticate(req, false)){
+		   		var respData = {
+						"Code": 401,
+						"Content": "After concatenating the userid, filename, timestamp, and the content of the HL7 XML file and applying the HMAC-SHA256 with a secret key, the hash value is different than the value in the x-as2-authtoken"
+					};
+				return res.json(respData);    		
+		   	}
+   	
 	        var file = req.params.filename;
-	    	var fpath = path.resolve("")+"\\"+file;
+	    	var fpath = path.resolve(configuration.uploadpath)+'/'+file;
 			var data = fs.readFileSync(fpath);
 			var sts = fs.statSync(fpath);
 
@@ -109,7 +156,6 @@
 								"created-date":sts.ctime
 								}
 			};
-			console.log(respData);
    	    	return res.json(respData);
 
     });
@@ -123,17 +169,16 @@
 //    	console.log(process.env.API_SECRET);
     	var crypto = require('crypto');
     	var requeststring = '';
-    	if(fileNameReqd){
-    		requeststring = req.params.userID + req.params.fileName + req.query.timestamp;
+    	if(fileNameReqd){        	
+    		requeststring = req.headers['x-as2-userid'] +  req.params.filename + req.headers['x-as2-timestamp'] + req.rawBody.toString('utf8');
     	} else {
-    		requeststring = req.params.userID + req.params.fileName + req.query.timestamp;	
+    		requeststring = req.headers['x-as2-userid'] +  req.headers['x-as2-timestamp'] ;	
     	}
     	
-    	console.log(requeststring);
+
     	var hmac = crypto.createHmac('sha256', 'Api Secret');
     	var token = decodeURIComponent(req.headers['x-as2-auth-token']);
     	var tempToken = hmac.update(requeststring).digest('base64');  
-    	console.log(tempToken);
     	return token == tempToken;
 
     }
