@@ -1,28 +1,33 @@
+
+Question 10:	
+Adjust Text Size:		
+
+The URL of the HTML and AngularJS code below is URL is http://mydomain.com/myapp.html. Which of the following statements correctly describe this document's output?
+
+<!doctype html>
 <html>
-<body>
-   <div ng-app="myModule">
-      <div ng-controller="myController1">
-         <div ng-controller="myController2">
-            {{$root.msg1}} {{$parent.msg2}} {{msg3}} {{msg4}}
-         </div>
-      </div>
-   </div>
+<head>
+   <style type="text/css">
+      .active { font-weight:bold; color:red; }
+   </style>
+</head>
+<body ng-app="myApp" ng-controller="myController">
+   <ul>
+      <li ng-repeat="page in pages">
+         <a ng-href="#!{{page.url}}" ng-class="{ active : active(page.url) }">{{page.title}}</a>
+      </li>
+   </ul>
    <script src="angular.js"></script>
    <script type="text/javascript">
-      var app = angular.module('myModule', []);
-      app.run(function($rootScope) {
-         $rootScope.msg1 = 'three';
-         $rootScope.msg2 = 'black';
-         $rootScope.msg4 = 'cats';
-      });
-      app.controller('myController1', function($scope) {
-         $scope.msg1 = 'four';
-         $scope.msg3 = 'big';
-         $scope.msg4 = 'dogs';
-      });
-      app.controller('myController2', function($scope) {
-         $scope.msg1 = 'five';
-         $scope.msg2 = 'white';
+      var app = angular.module('myApp', []);
+      app.config(function($locationProvider) { $locationProvider.hashPrefix('!'); });
+      app.controller('myController', function($scope, $location) {
+         $scope.pages = [
+            { url: '/page-a', title: 'Page A' },
+            { url: '/page-b', title: 'Page B' },
+            { url: '/page-c', title: 'Page C' }
+         ];
+         $scope.active = function(url) { return url == $location.url(); };
       });
    </script>
 </body>
