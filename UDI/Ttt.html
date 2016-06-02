@@ -1,27 +1,8 @@
-Which of the following correctly describe what happens in the HTML and AngularJS code below if the user fills the input element with label "Last Name" and leaves the input element with label "First Name" empty?
+unction generate(seed) { 
+    var private = seed; 
+    return function(param) { private += seed; return private + param; }; 
+} 
 
-<!doctype html>
-<html>
-<body ng-app="myApp">
-   <style type="text/css">
-      input[type="text"] { background-color: white; }
-      input[type="text"].ng-invalid-required { background-color: red; }
-      input[type="text"].ng-valid-required { background-color: green; }
-   </style>
-   <form name="myForm">
-      <p>
-         <label for="firstNameID">First Name</label>
-         <input type="text" id="firstNameID" name="firstName" ng-model="firstName" required/>
-      </p>
-      <p>
-         <label for="lasttNameID">Last Name</label>
-         <input type="text" id="secondNameID" name="lastName" ng-model="lastName" required/>
-      </p>
-      <p><input type="submit"/></p>
-   </form>
-   <script src="angular.js"></script>
-   <script type="text/javascript">
-      angular.module('myApp', []);
-   </script>
-</body>
-</html>
+var a = generate(1); 
+var b = generate(2); 
+var c = a(1) + a(2) + b(3) + b(4);
