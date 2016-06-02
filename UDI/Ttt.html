@@ -1,24 +1,19 @@
-unction generate(seed) { 
-    var private = seed; 
-    return function(param) { private += seed; return private + param; }; 
-} 
 
-var a = generate(1); 
-var b = generate(2); 
-var c = a(1) + a(2) + b(3) + b(<!doctype html>
-<html>
-<head>
-   <title>Displaying a bold text</title>
-</head>
-<body ng-app="myApp" ng-controller="myController">
-   <p>The first line is <span ng-bind="text"></span></p>
-   <p>The second line is <span ng-bind-html="text"></span></p>
-   <script src="angular.js"></script>
-   <script src="angular-sanitize.js"></script>
-   <script type="text/javascript">
-      angular.module('myApp', ['ngSanitize'])
-      .controller('myController', function($scope) {
-         $scope.text = '<strong>Hello</strong>';
-      });
-   </script>
-</body>
+<dl>
+   <dt>Tea is a</dt>
+   <dd>Hot drink</dd>
+   <dt>Milk is a</dt>
+   <dd>Cold drink</dd>
+</dl>
+
+<ol>
+   <li>Coffee</li>
+   <li>Tea</li>
+   <li>Milk</li>
+</ol>
+
+<ul>
+  <li>Water</li>
+  <li>Lemonade</li>
+  <li>Cola</li>
+</ul>
