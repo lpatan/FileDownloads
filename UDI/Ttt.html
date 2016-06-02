@@ -1,34 +1,22 @@
 
-Question 10:	
-Adjust Text Size:		
-
-The URL of the HTML and AngularJS code below is URL is http://mydomain.com/myapp.html. Which of the following statements correctly describe this document's output?
-
 <!doctype html>
 <html>
-<head>
-   <style type="text/css">
-      .active { font-weight:bold; color:red; }
-   </style>
-</head>
-<body ng-app="myApp" ng-controller="myController">
-   <ul>
-      <li ng-repeat="page in pages">
-         <a ng-href="#!{{page.url}}" ng-class="{ active : active(page.url) }">{{page.title}}</a>
-      </li>
-   </ul>
+<body ng-app="myApp">
+   <p>
+      <select ng-model="carBrand">Select a car brand
+         <option>Ford</option>
+         <option>Toyota</option>
+         <option>Mercedes</option>
+      </select>
+   </p>
+   <p ng-show="carBrand">Select a car type
+      <input type="radio" ng-model="carType" value="sport" ng-value="carBrand + ' Sport'"><label> Sports</ label>
+      <input type="radio" ng-model="carType" value="compact" ng-value="carBrand + ' Compact'"><label>    Compact</label>
+   </p>
+   <p ng-show="carType">The user's choice is {{carType}}</p>
    <script src="angular.js"></script>
    <script type="text/javascript">
       var app = angular.module('myApp', []);
-      app.config(function($locationProvider) { $locationProvider.hashPrefix('!'); });
-      app.controller('myController', function($scope, $location) {
-         $scope.pages = [
-            { url: '/page-a', title: 'Page A' },
-            { url: '/page-b', title: 'Page B' },
-            { url: '/page-c', title: 'Page C' }
-         ];
-         $scope.active = function(url) { return url == $location.url(); };
-      });
    </script>
 </body>
 </html>
