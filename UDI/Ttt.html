@@ -1,0 +1,29 @@
+<html>
+<body>
+   <div ng-app="myModule">
+      <div ng-controller="myController1">
+         <div ng-controller="myController2">
+            {{$root.msg1}} {{$parent.msg2}} {{msg3}} {{msg4}}
+         </div>
+      </div>
+   </div>
+   <script src="angular.js"></script>
+   <script type="text/javascript">
+      var app = angular.module('myModule', []);
+      app.run(function($rootScope) {
+         $rootScope.msg1 = 'three';
+         $rootScope.msg2 = 'black';
+         $rootScope.msg4 = 'cats';
+      });
+      app.controller('myController1', function($scope) {
+         $scope.msg1 = 'four';
+         $scope.msg3 = 'big';
+         $scope.msg4 = 'dogs';
+      });
+      app.controller('myController2', function($scope) {
+         $scope.msg1 = 'five';
+         $scope.msg2 = 'white';
+      });
+   </script>
+</body>
+</html>
