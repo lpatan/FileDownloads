@@ -1,22 +1,26 @@
-
-<!doctype html>
-<html>
+html>
+<head>
+   <title>Classes</title>
+   <style type="text/css">
+      body { color: black; font-size:18px; font-weight:normal }
+      .error { color: red; }
+      .important { font-weight: bold; }
+      .deleted { text-decoration: line-through; }
+      .big { font-size:22px; }
+      .small { font-size:12px; }
+   </style>
+</head>
 <body ng-app="myApp">
-   <p>
-      <select ng-model="carBrand">Select a car brand
-         <option>Ford</option>
-         <option>Toyota</option>
-         <option>Mercedes</option>
-      </select>
-   </p>
-   <p ng-show="carBrand">Select a car type
-      <input type="radio" ng-model="carType" value="sport" ng-value="carBrand + ' Sport'"><label> Sports</ label>
-      <input type="radio" ng-model="carType" value="compact" ng-value="carBrand + ' Compact'"><label>    Compact</label>
-   </p>
-   <p ng-show="carType">The user's choice is {{carType}}</p>
-   <script src="angular.js"></script>
+   <div ng-controller="myController">
+      <p id="msg1" class="big" ng-class="{deleted: msg1.isDeleted, important: msg1.isImportant, error: msg1.isError}">This is the first message</p>
+      <p id="msg2" class="small {{msg2.isDeleted?'deleted':''}} {{msg2.isImportant?'important':''}} {{msg2.isError?'error':''}}">This is the second message</p>
+   </div>
    <script type="text/javascript">
-      var app = angular.module('myApp', []);
-   </script>
+   angular.module('myApp', [])
+   .controller('myController', function($scope) {
+      $scope.msg1 = { isImportant : true, isError : true, isDeleted : false };
+      $scope.msg2 = { isImportant : false, isError : false, isDeleted : true };
+   });
+</script>
 </body>
 </html>
