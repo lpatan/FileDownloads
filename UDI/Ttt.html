@@ -1,26 +1,27 @@
-html>
-<head>
-   <title>Classes</title>
-   <style type="text/css">
-      body { color: black; font-size:18px; font-weight:normal }
-      .error { color: red; }
-      .important { font-weight: bold; }
-      .deleted { text-decoration: line-through; }
-      .big { font-size:22px; }
-      .small { font-size:12px; }
-   </style>
-</head>
+Which of the following correctly describe what happens in the HTML and AngularJS code below if the user fills the input element with label "Last Name" and leaves the input element with label "First Name" empty?
+
+<!doctype html>
+<html>
 <body ng-app="myApp">
-   <div ng-controller="myController">
-      <p id="msg1" class="big" ng-class="{deleted: msg1.isDeleted, important: msg1.isImportant, error: msg1.isError}">This is the first message</p>
-      <p id="msg2" class="small {{msg2.isDeleted?'deleted':''}} {{msg2.isImportant?'important':''}} {{msg2.isError?'error':''}}">This is the second message</p>
-   </div>
+   <style type="text/css">
+      input[type="text"] { background-color: white; }
+      input[type="text"].ng-invalid-required { background-color: red; }
+      input[type="text"].ng-valid-required { background-color: green; }
+   </style>
+   <form name="myForm">
+      <p>
+         <label for="firstNameID">First Name</label>
+         <input type="text" id="firstNameID" name="firstName" ng-model="firstName" required/>
+      </p>
+      <p>
+         <label for="lasttNameID">Last Name</label>
+         <input type="text" id="secondNameID" name="lastName" ng-model="lastName" required/>
+      </p>
+      <p><input type="submit"/></p>
+   </form>
+   <script src="angular.js"></script>
    <script type="text/javascript">
-   angular.module('myApp', [])
-   .controller('myController', function($scope) {
-      $scope.msg1 = { isImportant : true, isError : true, isDeleted : false };
-      $scope.msg2 = { isImportant : false, isError : false, isDeleted : true };
-   });
-</script>
+      angular.module('myApp', []);
+   </script>
 </body>
 </html>
